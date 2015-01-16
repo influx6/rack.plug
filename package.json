@@ -1,0 +1,37 @@
+{
+  "name": "rack.plug",
+  "version": "0.0.1",
+  "description": "file configuration loader in the plug.js framework,it loads all files into memory for fast request",
+  "main": "./rack.plug.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies":{
+    "graceful-fs": ">=0.3.x",
+    "stackq":">=0.1.8",
+    "plugd":">=0.0.11",
+    "fs.plug":">=0.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/influx6/rack.plug"
+  },
+  "keywords": [
+    "rackdb",
+    "rack",
+    "plug",
+    "plug.js",
+    "fs",
+    "file",
+    "system",
+    "plugs",
+    "filesystem.plugs",
+    "fs.plug"
+  ],
+  "author": "Alexander Adeniyin Ewetumo",
+  "license": "Mit",
+  "bugs": {
+    "url": "https://github.com/influx6/rack.plug/issues"
+  },
+  "homepage": "https://github.com/influx6/rack.plug"
+}

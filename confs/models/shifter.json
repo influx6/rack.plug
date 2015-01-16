@@ -1,0 +1,12 @@
+{
+
+  custom: {
+    '/user/bit': function(req){}
+  },
+
+  use: {
+    '/user/:id': function(req){},
+    '/user/box/:id': function(req){},
+  },
+
+}
