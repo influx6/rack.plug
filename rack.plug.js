@@ -36,7 +36,7 @@ module.exports = (function(){
 
     this.tasks().on(this.$bind(function(p){
       models = p.body.models;
-      this.Task.make('rack.fs',{ task: 'dir.read', file: models },uuid);
+      this.Reply.make('load.fs',{ task: 'dir.read', file: models },uuid);
       this.tasks('rload').resume();
     }));
 
@@ -44,21 +44,11 @@ module.exports = (function(){
 
   rackstore.registerPlug('loadModel',function(){
     var uuid = _.Util.guid();
+
     this.newSrcReply('model.data',uuid).on(this.$bind(function(p){
-      var lists = p.stream(), data = [];
-      lists.on(_.funcs.restrictArgs(_.funcs.bind(data.push,data),1));
-      lists.onEvent('dataEnd',this.$bind(function(f){
-        console.log('end of stream',data.toString());
-        var code = data.join(''),json;
-        try{
-          console.log('converting',code);
-          json = JSON.stringify(code);
-          console.log('converted',json);
-        }catch(e){
-          console.log('loadModel.error',e);
-          this.Task.from(p,'loadModel.error');
-        }
-      }));
+      var f = p.link(this.Task.from(p,'load.model.data'));
+      f.config(p.body);
+      f.config({ name: path.basename(p.body.p) });
     }));
 
     this.tasks().on(this.$bind(function(p){
@@ -71,6 +61,7 @@ module.exports = (function(){
   rackstore.rack = plug.Network.blueprint(function(){
 
     this.use(fs.Plug('io.iocontrol'),this.makeName('fs'));
+
     this.use(rackstore.Plug('loadModels','rack.models'),this.makeName('load.models'));
     this.use(rackstore.Plug('loadModel','rack.model'),this.makeName('load.model'));
 
@@ -90,20 +81,26 @@ module.exports = (function(){
     this.networkOut(this.replies());
 
     this.newTask('conf',this.makeName('conf'));
+    this.newTask('rload',this.makeName('reload'));
+
+    this.tasks('rload').on(this.$bind(function(p){
+      rack.Task.make('models.reload',{ models : conf.models });
+    }));
 
     this.tasks('conf').on(this.$bind(function(p){
       conf = p.body;
       if(_.valids.not.contains(conf,'base')) return;
       if(_.valids.not.contains(conf,'models')) return;
-      rack.Task.make('io.control.conf',{ base : conf.base });
+      rack.Task.make('io.iocontrol.conf',{ base : conf.base });
       rack.Task.make('rack.models',{ models : conf.models });
     }));
 
   });
 
-
   rackstore.RackIO = plug.Network.blueprint(function(){
-    this.use(rackstore.Plug('rackdb'),this.makeName('rackbox'));
+    this.use(rackstore.Plug('rackdb'),this.makeName('rackdb'));
   });
+
+  return rackstore;
 
 }());
